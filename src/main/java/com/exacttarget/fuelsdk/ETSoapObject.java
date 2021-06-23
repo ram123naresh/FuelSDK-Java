@@ -37,6 +37,8 @@ package com.exacttarget.fuelsdk;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -1505,8 +1507,23 @@ public abstract class ETSoapObject extends ETApiObject {
               default:
                 break;
             }
-            for (String value : values) {
-                simpleFilterPart.getValue().add(value);
+            if (simpleFilterPart.getSimpleOperator().equals(SimpleOperators.BETWEEN)) {
+                try {
+                    SimpleDateFormat formatter  = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                    for (String value : values) {
+                        simpleFilterPart.getDateValue().add(formatter.parse(value));
+                    }
+                }
+                catch (ParseException e) {
+                    for (String value : values) {
+                        simpleFilterPart.getValue().add(value);
+                    }
+                }
+            }
+            else{
+                for (String value : values) {
+                    simpleFilterPart.getValue().add(value);
+                }
             }
             return simpleFilterPart;
         }
